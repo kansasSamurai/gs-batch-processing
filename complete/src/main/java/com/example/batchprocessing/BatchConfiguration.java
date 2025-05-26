@@ -63,6 +63,10 @@ public class BatchConfiguration {
 			.reader(reader)
 			.processor(processor)
 			.writer(writer)
+			.chunk(1)
+			.faultTolerant()
+			.skipLimit(10)
+			.skip(SkippableException.class)
 			.build();
 	}
 	// end::jobstep[]

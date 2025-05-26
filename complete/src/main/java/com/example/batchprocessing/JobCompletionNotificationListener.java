@@ -1,5 +1,7 @@
 package com.example.batchprocessing;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +28,11 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
 		if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
 			log.info("!!! JOB FINISHED! Time to verify the results");
 
+			AtomicInteger counter = new AtomicInteger(0);
+
 			jdbcTemplate
 					.query("SELECT first_name, last_name FROM people", new DataClassRowMapper<>(Person.class))
-					.forEach(person -> log.info("Found <{}> in the database.", person));
+					.forEach(person -> log.info("Found [i:{}] <{}> in the database.", counter.incrementAndGet(), person));
 		}
 	}
 }
