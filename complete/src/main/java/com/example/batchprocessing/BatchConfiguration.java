@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -32,6 +33,7 @@ public class BatchConfiguration {
 	}
 
 	@Bean
+	@StepScope
 	public PersonItemProcessor processor() {
 		return new PersonItemProcessor();
 	}
@@ -59,11 +61,10 @@ public class BatchConfiguration {
 	public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
 					  FlatFileItemReader<Person> reader, PersonItemProcessor processor, JdbcBatchItemWriter<Person> writer) {
 		return new StepBuilder("step1", jobRepository)
-			.<Person, Person>chunk(3, transactionManager)
+			.<Person, Person>chunk(1, transactionManager)
 			.reader(reader)
 			.processor(processor)
 			.writer(writer)
-			.chunk(1)
 			.faultTolerant()
 			.skipLimit(10)
 			.skip(SkippableException.class)
